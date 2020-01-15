@@ -74,14 +74,16 @@ impl ThrottlePool {
 
 					Ok(Some(sleep))
 				}
-			}).take_while(|sleep| Ok(sleep.is_some()))
+			})
+			.take_while(|sleep| Ok(sleep.is_some()))
 			.and_then({
 				move |sleep| {
 					// sleep for the required duration
 					tokio_timer::sleep(sleep.unwrap_or_else(|| Duration::from_secs(0)))
 						.map_err(|e| e.context(ErrorKind::Timer("queue future could not sleep")))
 				}
-			}).for_each(|_| Ok(()))
+			})
+			.for_each(|_| Ok(()))
 			.from_err()
 	}
 }
